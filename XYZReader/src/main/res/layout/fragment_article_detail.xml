@@ -136,18 +136,19 @@
                 android:nestedScrollingEnabled="true"
                 android:paddingBottom="@dimen/detail_body_bottom_margin"
                 android:paddingTop="16dp"
-                android:text="@string/demo_article_body"
                 android:textColor="@color/HeaderTextColor"
                 android:textColorLink="@color/colorAccent"
                 android:textSize="@dimen/detail_body_text_size"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                android:scrollbars="vertical"
                 />
-
 
         </LinearLayout>
 
 
     </android.support.v4.widget.NestedScrollView>
+
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/share_fab"

@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -280,10 +279,9 @@ public class ArticleDetailFragment extends Fragment implements
                                 + "</font>"));
 
             }
-            // FIXME: 05/04/2018 this line is the problem!!! move it to ---> AsyncTask Class.
-            // bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
-            // FIXME: 05/04/2018 Not solve anything, problem is putting that huge result text into TextView with .setText on mainThread
-            new MyAsyncTask().execute("");
+            // FIXMEED: 05/04/2018 this line is the problem!!!
+            String result = String.valueOf(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
+            mBodyView.setText(result.toCharArray(), 0, 1000);
 
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
@@ -316,32 +314,6 @@ public class ArticleDetailFragment extends Fragment implements
             bylineView.setText("N/A" );
             mBodyView.setText("N/A");
         }
-    }
-
-
-    private class MyAsyncTask extends AsyncTask<String , String , String > {
-        protected String doInBackground(String... urls) {
-            // do some thing in background
-            String result = String.valueOf(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
-
-            //bodyView.setText();
-            return result;
-        }
-        @Override
-        protected void onPreExecute() {
-
-            // this will execute on main thread before Method doInBackground()
-
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            // FIXME: 05/04/2018 This make app very laggy.
-            mBodyView.setText(result);
-          //  super.onPostExecute(result);
-        }
-
     }
 
 
