@@ -20,6 +20,9 @@
     <color name="colorPrimary">#3D3935</color>
     <color name="colorAccent">#B07D4A</color>
 
+    <color name="HeaderTextColor">#1C1C1C</color>
+    <color name="SubHeaderTextColor">#706F6E</color>
+
 
 
 
