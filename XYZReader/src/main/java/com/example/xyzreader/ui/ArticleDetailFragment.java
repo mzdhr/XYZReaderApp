@@ -9,8 +9,10 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.widget.NestedScrollView;
@@ -23,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.volley.VolleyError;
@@ -67,6 +70,11 @@ public class ArticleDetailFragment extends Fragment implements
     private SimpleDateFormat outputFormat = new SimpleDateFormat();
     // Most time functions can only handle 1902 - 2037
     private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2,1,1);
+
+    private ProgressBar mProgressBar;
+    private NestedScrollView mNestedScrollView;
+    private AppBarLayout mAppBarLayout;
+    private TextView mBodyView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -121,6 +129,10 @@ public class ArticleDetailFragment extends Fragment implements
         mDrawInsetsFrameLayout = (CoordinatorLayout)
                 mRootView.findViewById(R.id.draw_insets_frame_layout);
 
+        mProgressBar = (ProgressBar) mRootView.findViewById(R.id.progressBar);
+        mAppBarLayout = (AppBarLayout) mRootView.findViewById(R.id.app_bar_layout);
+
+
 
         // Back Button
 //        Toolbar toolbar = new Toolbar(getActivity());
@@ -133,7 +145,8 @@ public class ArticleDetailFragment extends Fragment implements
         mRootView.findViewById(R.id.action_up).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().onNavigateUp();
+                getLoaderManager().destroyLoader(0);
+                getActivity().onNavigateUp(); //onBackPressed();
             }
         });
 
@@ -146,9 +159,9 @@ public class ArticleDetailFragment extends Fragment implements
 //        });
 
 
-        NestedScrollView nestedScrollView = (NestedScrollView) mRootView.findViewById(R.id.nested_scroll_view);
+        mNestedScrollView = (NestedScrollView) mRootView.findViewById(R.id.nested_scroll_view);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            nestedScrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            mNestedScrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
                 @Override
                 public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
                     mScrollY = scrollY;
@@ -238,10 +251,10 @@ public class ArticleDetailFragment extends Fragment implements
         TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
         TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
         bylineView.setMovementMethod(new LinkMovementMethod());
-        TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
+        mBodyView = (TextView) mRootView.findViewById(R.id.article_body);
 
 
-        bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
+        mBodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
 
         if (mCursor != null) {
             mRootView.setAlpha(0);
@@ -267,7 +280,11 @@ public class ArticleDetailFragment extends Fragment implements
                                 + "</font>"));
 
             }
-            bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
+            // FIXME: 05/04/2018 this line is the problem!!! move it to ---> AsyncTask Class.
+            // bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
+            // FIXME: 05/04/2018 Not solve anything, problem is putting that huge result text into TextView with .setText on mainThread
+            new MyAsyncTask().execute("");
+
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
                         @Override
@@ -288,13 +305,45 @@ public class ArticleDetailFragment extends Fragment implements
 
                         }
                     });
+
+            mProgressBar.setVisibility(View.INVISIBLE);
+            mNestedScrollView.setVisibility(View.VISIBLE);
+
+
         } else {
             mRootView.setVisibility(View.GONE);
             titleView.setText("N/A");
             bylineView.setText("N/A" );
-            bodyView.setText("N/A");
+            mBodyView.setText("N/A");
         }
     }
+
+
+    private class MyAsyncTask extends AsyncTask<String , String , String > {
+        protected String doInBackground(String... urls) {
+            // do some thing in background
+            String result = String.valueOf(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
+
+            //bodyView.setText();
+            return result;
+        }
+        @Override
+        protected void onPreExecute() {
+
+            // this will execute on main thread before Method doInBackground()
+
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // FIXME: 05/04/2018 This make app very laggy.
+            mBodyView.setText(result);
+          //  super.onPostExecute(result);
+        }
+
+    }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {

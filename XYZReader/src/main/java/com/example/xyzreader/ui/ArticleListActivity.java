@@ -68,6 +68,14 @@ public class ArticleListActivity extends AppCompatActivity implements
         if (savedInstanceState == null) {
             refresh();
         }
+
+//        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                mRecyclerView.setVisibility(View.INVISIBLE);
+//            }
+//        });
+
     }
 
     private void refresh() {
@@ -101,6 +109,12 @@ public class ArticleListActivity extends AppCompatActivity implements
 
     private void updateRefreshingUI() {
         mSwipeRefreshLayout.setRefreshing(mIsRefreshing);
+        if (mIsRefreshing){
+            mRecyclerView.setVisibility(View.INVISIBLE);
+        } else {
+            mRecyclerView.setVisibility(View.VISIBLE);
+        }
+
     }
 
     @Override
@@ -114,8 +128,7 @@ public class ArticleListActivity extends AppCompatActivity implements
         adapter.setHasStableIds(true);
         mRecyclerView.setAdapter(adapter);
         int columnCount = getResources().getInteger(R.integer.list_column_count);
-        StaggeredGridLayoutManager sglm =
-                new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
+        StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(sglm);
     }
 
@@ -123,6 +136,7 @@ public class ArticleListActivity extends AppCompatActivity implements
     public void onLoaderReset(Loader<Cursor> loader) {
         mRecyclerView.setAdapter(null);
     }
+
 
     private class Adapter extends RecyclerView.Adapter<ViewHolder> {
         private Cursor mCursor;
