@@ -124,16 +124,6 @@ public class ArticleDetailFragment extends Fragment implements
         getLoaderManager().initLoader(0, null, this);
     }
 
-//
-//    Fragment animalDetailFragment = AnimalDetailFragment.newInstance(animalItem, transitionName);
-//    getFragmentManager()
-//                .beginTransaction()
-//                .addSharedElement(sharedImageView, ViewCompat.getTransitionName(sharedImageView))
-//            .addToBackStack(TAG)
-//                .replace(R.id.content, animalDetailFragment)
-//                .commit();
-//}
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -160,21 +150,6 @@ public class ArticleDetailFragment extends Fragment implements
             }
         }
 
-
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            setSharedElementEnterTransition(TransitionInflater.from(getActivity()).inflateTransition(android.R.transition.move));
-//        }
-//        startPostponedEnterTransition(getActivity());
-
-
-        // Back Button
-//        Toolbar toolbar = new Toolbar(getActivity());
-//        toolbar = (Toolbar) mRootView.findViewById(R.id.app_bar);
-//        getActivity().getActionBar();
-//
-//        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-//        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         mRootView.findViewById(R.id.action_up).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -183,41 +158,7 @@ public class ArticleDetailFragment extends Fragment implements
             }
         });
 
-
-//        mDrawInsetsFrameLayout.setOnInsetsCallback(new DrawInsetsFrameLayout.OnInsetsCallback() {
-//            @Override
-//            public void onInsetsChanged(Rect insets) {
-//                mTopInset = insets.top;
-//            }
-//        });
-
-
         mNestedScrollView = (NestedScrollView) mRootView.findViewById(R.id.nested_scroll_view);
-        // FIXED: 06/04/2018 !!!!! Not Needed.
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            mNestedScrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-//                @Override
-//                public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-//                    mScrollY = scrollY;
-//                    getActivityCast().onUpButtonFloorChanged(mItemId, ArticleDetailFragment.this);
-//                    mPhotoContainerView.setTranslationY((int) (mScrollY - mScrollY / PARALLAX_FACTOR));
-//                    updateStatusBar();
-//                }
-//            });
-//        }
-
-//        mScrollView = (ObservableScrollView) mRootView.findViewById(R.id.scrollview);
-//        mScrollView.setCallbacks(new ObservableScrollView.Callbacks() {
-//            @Override
-//            public void onScrollChanged() {
-//                mScrollY = mScrollView.getScrollY();
-//                getActivityCast().onUpButtonFloorChanged(mItemId, ArticleDetailFragment.this);
-//                mPhotoContainerView.setTranslationY((int) (mScrollY - mScrollY / PARALLAX_FACTOR));
-//                updateStatusBar();
-//            }
-//        });
-
-
 
         mStatusBarColorDrawable = new ColorDrawable(0);
 
@@ -330,7 +271,7 @@ public class ArticleDetailFragment extends Fragment implements
                                         .setBackgroundColor(mMutedColor);
                                 updateStatusBar();
 
-                                // Transition
+                                // Start Transition when Image loaded
                                 startPostponedEnterTransition(getActivity());
                             }
                         }
@@ -394,6 +335,5 @@ public class ArticleDetailFragment extends Fragment implements
                 ? (int) mPhotoContainerView.getTranslationY() + mPhotoView.getHeight() - mScrollY
                 : mPhotoView.getHeight() - mScrollY;
     }
-
 
 }

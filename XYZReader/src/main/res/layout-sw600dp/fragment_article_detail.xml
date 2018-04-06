@@ -4,9 +4,7 @@
                                                  android:id="@+id/draw_insets_frame_layout"
                                                  android:layout_width="match_parent"
                                                  android:layout_height="match_parent"
-                                                 app:layout_collapseMode="pin"
-    >
-
+                                                 app:layout_collapseMode="pin">
 
     <FrameLayout
         android:id="@+id/photo_container"
@@ -20,10 +18,10 @@
             android:id="@+id/photo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:focusableInTouchMode="true"
             android:scaleType="centerCrop"
             app:layout_collapseMode="parallax"
             app:layout_collapseParallaxMultiplier="0.5"
-            android:focusableInTouchMode="true"
             />
 
         <View
