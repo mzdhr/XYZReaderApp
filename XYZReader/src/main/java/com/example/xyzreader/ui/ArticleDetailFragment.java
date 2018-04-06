@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -159,17 +158,18 @@ public class ArticleDetailFragment extends Fragment implements
 
 
         mNestedScrollView = (NestedScrollView) mRootView.findViewById(R.id.nested_scroll_view);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mNestedScrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-                @Override
-                public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                    mScrollY = scrollY;
-                    getActivityCast().onUpButtonFloorChanged(mItemId, ArticleDetailFragment.this);
-                    mPhotoContainerView.setTranslationY((int) (mScrollY - mScrollY / PARALLAX_FACTOR));
-                    updateStatusBar();
-                }
-            });
-        }
+        // FIXED: 06/04/2018 !!!!! Not Needed.
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            mNestedScrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+//                @Override
+//                public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+//                    mScrollY = scrollY;
+//                    getActivityCast().onUpButtonFloorChanged(mItemId, ArticleDetailFragment.this);
+//                    mPhotoContainerView.setTranslationY((int) (mScrollY - mScrollY / PARALLAX_FACTOR));
+//                    updateStatusBar();
+//                }
+//            });
+//        }
 
 //        mScrollView = (ObservableScrollView) mRootView.findViewById(R.id.scrollview);
 //        mScrollView.setCallbacks(new ObservableScrollView.Callbacks() {
@@ -192,7 +192,7 @@ public class ArticleDetailFragment extends Fragment implements
             public void onClick(View view) {
                 startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
                         .setType("text/plain")
-                        .setText("Some sample text")
+                        .setText(mBodyView.getText().subSequence(0, 200) + "...")
                         .getIntent(), getString(R.string.action_share)));
             }
         });
