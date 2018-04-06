@@ -8,6 +8,8 @@ import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -40,6 +42,9 @@ public class ArticleListActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = ArticleListActivity.class.toString();
+    public static final String EXTRA_IMAGE_TRANSITION_NAME = "extra_image_transition_name";
+
+
     private Toolbar mToolbar;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
@@ -48,7 +53,7 @@ public class ArticleListActivity extends AppCompatActivity implements
     // Use default locale format
     private SimpleDateFormat outputFormat = new SimpleDateFormat();
     // Most time functions can only handle 1902 - 2037
-    private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2,1,1);
+    private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2, 1, 1);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +61,7 @@ public class ArticleListActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_article_list);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
 
 
         //final View toolbarContainerView = findViewById(R.id.toolbar_container);
@@ -109,7 +115,7 @@ public class ArticleListActivity extends AppCompatActivity implements
 
     private void updateRefreshingUI() {
         mSwipeRefreshLayout.setRefreshing(mIsRefreshing);
-        if (mIsRefreshing){
+        if (mIsRefreshing) {
             mRecyclerView.setVisibility(View.INVISIBLE);
         } else {
             mRecyclerView.setVisibility(View.VISIBLE);
@@ -158,8 +164,19 @@ public class ArticleListActivity extends AppCompatActivity implements
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    startActivity(new Intent(Intent.ACTION_VIEW,
-                            ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))));
+                    // TODO: 06/04/2018 pass transitionName and Item! in a Bundle. Add too ActivityOptions.
+                    Intent intent = new Intent(Intent.ACTION_VIEW, ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition())));
+                    intent.putExtra(EXTRA_IMAGE_TRANSITION_NAME, ViewCompat.getTransitionName(vh.thumbnailView));
+
+                    ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            ArticleListActivity.this,
+                            vh.thumbnailView,
+                            vh.thumbnailView.getTransitionName());
+                            //ViewCompat.getTransitionName(vh.thumbnailView));
+                    startActivity(intent, options.toBundle());
+
+//                    startActivity(new Intent(Intent.ACTION_VIEW,
+//                            ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))));
                 }
             });
             return vh;
@@ -176,6 +193,7 @@ public class ArticleListActivity extends AppCompatActivity implements
             }
         }
 
+        // TODO: 06/04/2018 method is where we set the transitionName
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
             mCursor.moveToPosition(position);
@@ -193,9 +211,14 @@ public class ArticleListActivity extends AppCompatActivity implements
             } else {
                 holder.subtitleView.setText(Html.fromHtml(
                         outputFormat.format(publishedDate)
-                        + "<br/>" + " by "
-                        + mCursor.getString(ArticleLoader.Query.AUTHOR)));
+                                + "<br/>" + " by "
+                                + mCursor.getString(ArticleLoader.Query.AUTHOR)));
             }
+
+            // TODO: 06/04/2018 setting imageview transition name.
+            holder.thumbnailView.setTransitionName(holder.titleView.getText().toString() + position);
+            holder.thumbnailView.setTag(holder.titleView.getText().toString() + position);
+
             holder.thumbnailView.setImageUrl(
                     mCursor.getString(ArticleLoader.Query.THUMB_URL),
                     ImageLoaderHelper.getInstance(ArticleListActivity.this).getImageLoader());

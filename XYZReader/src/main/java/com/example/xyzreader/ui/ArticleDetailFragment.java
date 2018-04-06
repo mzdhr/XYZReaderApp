@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -35,6 +36,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+
+import static android.support.v4.app.ActivityCompat.postponeEnterTransition;
+import static android.support.v4.app.ActivityCompat.startPostponedEnterTransition;
 
 /**
  * A fragment representing a single Article detail screen. This fragment is
@@ -120,16 +124,47 @@ public class ArticleDetailFragment extends Fragment implements
         getLoaderManager().initLoader(0, null, this);
     }
 
+//
+//    Fragment animalDetailFragment = AnimalDetailFragment.newInstance(animalItem, transitionName);
+//    getFragmentManager()
+//                .beginTransaction()
+//                .addSharedElement(sharedImageView, ViewCompat.getTransitionName(sharedImageView))
+//            .addToBackStack(TAG)
+//                .replace(R.id.content, animalDetailFragment)
+//                .commit();
+//}
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
-        mDrawInsetsFrameLayout = (CoordinatorLayout)
-                mRootView.findViewById(R.id.draw_insets_frame_layout);
 
+        mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
+        mDrawInsetsFrameLayout = (CoordinatorLayout) mRootView.findViewById(R.id.draw_insets_frame_layout);
+        mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
+        mPhotoContainerView = mRootView.findViewById(R.id.photo_container);
         mProgressBar = (ProgressBar) mRootView.findViewById(R.id.progressBar);
         mAppBarLayout = (AppBarLayout) mRootView.findViewById(R.id.app_bar_layout);
 
+        // Preparing Transition
+        postponeEnterTransition(getActivity());
+
+        if (savedInstanceState == null) {
+            if (getActivity().getIntent() != null && getActivity().getIntent().getData() != null) {
+                Bundle extras = getActivity().getIntent().getExtras();
+                Log.d(TAG, "ArticleDetailFragment -> onCreate: " + extras.get(ArticleListActivity.EXTRA_IMAGE_TRANSITION_NAME));
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    mPhotoView.setTransitionName(String.valueOf(extras.get(ArticleListActivity.EXTRA_IMAGE_TRANSITION_NAME)));
+                    Log.d(TAG, "onCreateView: setTransitionName");
+                }
+            }
+        }
+
+
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            setSharedElementEnterTransition(TransitionInflater.from(getActivity()).inflateTransition(android.R.transition.move));
+//        }
+//        startPostponedEnterTransition(getActivity());
 
 
         // Back Button
@@ -182,8 +217,7 @@ public class ArticleDetailFragment extends Fragment implements
 //            }
 //        });
 
-        mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
-        mPhotoContainerView = mRootView.findViewById(R.id.photo_container);
+
 
         mStatusBarColorDrawable = new ColorDrawable(0);
 
@@ -295,6 +329,9 @@ public class ArticleDetailFragment extends Fragment implements
                                 mRootView.findViewById(R.id.meta_bar)
                                         .setBackgroundColor(mMutedColor);
                                 updateStatusBar();
+
+                                // Transition
+                                startPostponedEnterTransition(getActivity());
                             }
                         }
 

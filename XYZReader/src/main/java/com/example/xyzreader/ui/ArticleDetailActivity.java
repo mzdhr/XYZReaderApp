@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import com.example.xyzreader.data.ItemsContract;
 public class ArticleDetailActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final String TAG = ArticleDetailActivity.class.getSimpleName();
     private Cursor mCursor;
     private long mStartId;
 
@@ -102,6 +104,9 @@ public class ArticleDetailActivity extends AppCompatActivity
             if (getIntent() != null && getIntent().getData() != null) {
                 mStartId = ItemsContract.Items.getItemId(getIntent().getData());
                 mSelectedItemId = mStartId;
+
+                Bundle extras = getIntent().getExtras();
+                Log.d(TAG, "onCreate: " + extras.get(ArticleListActivity.EXTRA_IMAGE_TRANSITION_NAME));
             }
         }
     }
